@@ -1,0 +1,5 @@
+{
+  "name": "Neural Block Tracker",
+  "description": "A visual, hourly daily tracker designed to help with time management.",
+  "requestFramePermissions": []
+}
