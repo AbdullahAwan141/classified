@@ -1,85 +1,52 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useLocalStorage } from './hooks/useLocalStorage';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, Calendar, Clock, RefreshCw, RotateCw, Plus, X, ChevronLeft, ChevronRight, ListTodo, PieChart, AlertTriangle, ArrowRight, Trash2, LayoutList, Pencil, Bell, BellRing, Save, Copy, Download, Target, Activity, Settings, TrendingUp } from 'lucide-react';
+import { Check, Calendar, Clock, RefreshCw, RotateCw, Plus, X, ChevronLeft, ChevronRight, ListTodo, PieChart, AlertTriangle, ArrowRight, Trash2, LayoutList, Pencil, Bell, BellRing, Save, Copy, Download, Target, Activity, Settings, TrendingUp, Sparkles } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 
-type CategoryType = 'none' | 'focus' | 'care' | 'leisure' | 'family' | 'waste' | 'urgent' | 'prayer';
+// Import new architecture
+import { GlobalProvider, useGlobal, useUIState, useModalState } from './contexts/GlobalProvider';
+import { calculateTemporalStats } from './services/temporal.service';
+import { calculateCategoryStats, CATEGORIES } from './services/analytics.service';
+import { Z_INDEX } from './design-system/theme';
+import { getDayString, createEmptyDay, generateId } from './utils/helpers';
+import type { CategoryType, Task, DayTemplate } from './types';
 
-interface Subtask {
-  id: string;
-  text: string;
-  completed: boolean;
-  category?: CategoryType;
-  startTime?: string; // HH:MM
-  endTime?: string;   // HH:MM
-  duration?: number;  // in minutes
-  reminder?: boolean;
-}
+// Import modules
+import { ProtocolAlert } from './modules/TemporalEngine';
 
-interface WastedLog {
-  id: string;
-  reason: string;
-  timeLost: string;
-  loggedAt: string;
-}
+const App = () => {
+  return (
+    <GlobalProvider>
+      <AppContent />
+    </GlobalProvider>
+  );
+};
 
-interface ScreenTimeLog {
-  id: string;
-  appName: string;
-  duration: string;
-  loggedAt: string;
-}
+const AppContent = () => {
+  const global = useGlobal();
+  const { viewDensity, setViewDensity, selectedHour, setSelectedHour, activeAsideTab, setActiveAsideTab, alertDismissedForDebt, setAlertDismissedForDebt } = useUIState();
+  const { toggleProtocolSettings, toggleWastedLog, toggleScreenTime } = useModalState();
 
-interface Task {
-  text: string;
-  category: CategoryType;
-  completed: boolean;
-  subtasks: Subtask[];
-  reminder?: boolean;
-  energy?: 'low' | 'neutral' | 'high';
-}
-
-interface DayTemplate {
-  id: string;
-  name: string;
-  tasks: Record<number, Task>;
-}
-
-// Data structure: root is an object keyed by date string (YYYY-MM-DD).
-// Inside each date is an object keyed by hour (0-23) pointing to a Task.
-type TrackData = Record<string, Record<number, Task>>;
-
-const CATEGORIES: { id: CategoryType; color: string; bgClass: string; label: string; hex: string }[] = [
-  { id: 'none', color: 'bg-white/20', bgClass: 'bg-white/[0.03]', label: 'Unplanned', hex: '#64748b' },
-  { id: 'focus', color: 'bg-[#cfb991]', bgClass: 'bg-[#cfb991]/10 border-[#cfb991]/30', label: 'Study/Work', hex: '#cfb991' },
-  { id: 'prayer', color: 'bg-[#899ca1]', bgClass: 'bg-[#899ca1]/10 border-[#899ca1]/30', label: 'Prayer/Soul', hex: '#899ca1' },
-  { id: 'family', color: 'bg-[#a38699]', bgClass: 'bg-[#a38699]/10 border-[#a38699]/30', label: 'Family/Social', hex: '#a38699' },
-  { id: 'care', color: 'bg-[#738775]', bgClass: 'bg-[#738775]/10 border-[#738775]/30', label: 'Self Care', hex: '#738775' },
-  { id: 'leisure', color: 'bg-[#a89d95]', bgClass: 'bg-[#a89d95]/10 border-[#a89d95]/30', label: 'Leisure', hex: '#a89d95' },
-  { id: 'waste', color: 'bg-[#8B0000]', bgClass: 'bg-[#8B0000]/10 border-[#8B0000]/30', label: 'Time Wasted', hex: '#8B0000' },
-  { id: 'urgent', color: 'bg-[#B06F5C]', bgClass: 'bg-[#B06F5C]/10 border-[#B06F5C]/30', label: 'Urgent', hex: '#B06F5C' },
-];
-
-function formatHour(hour: number) {
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour % 12 || 12;
-  return { time: `${displayHour}:00`, ampm };
-}
-
-function getDayString(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function createEmptyDay(defaultCategory: CategoryType = 'none'): Record<number, Task> {
-  const day: Record<number, Task> = {};
-  for (let i = 0; i < 24; i++) {
-    day[i] = { text: '', category: defaultCategory, completed: false, subtasks: [] };
-  }
-  return day;
+  const {
+    trackData,
+    setTrackData,
+    wastedLogs,
+    setWastedLogs,
+    masterTasks,
+    setMasterTasks,
+    dailyThemes,
+    setDailyThemes,
+    academicCourses,
+    setAcademicCourses,
+    protocolSettings,
+    setProtocolSettings,
+    currentDate: currentDateObj,
+    selectedDate,
+    actualHour,
+    isProtocolSettingsOpen,
+    isWastedLogOpen,
+    isScreenTimeOpen,
+  } = global;
 }
 
 const App = () => {
@@ -1450,23 +1417,6 @@ const BlockCountdown = ({ active }: { active: boolean }) => {
                        />
                      </div>
                    </div>
-                         className="w-full bg-[#141414] border border-[#cfb991]/20 rounded-xl px-3 py-2 text-[#cfb991] font-mono focus:outline-none focus:border-[#cfb991]/60"
-                         required
-                       />
-                     </div>
-                     <span className="text-[#cfb991]/40 font-mono text-xl pt-4">=</span>
-                     <div className="flex-1">
-                       <label className="text-[8px] font-black uppercase text-white/40 block mb-1">Minutes of Leisure</label>
-                       <input
-                         type="number"
-                         min="1"
-                         value={protocolSettings.focusToRewardRatioReward}
-                         onChange={(e) => setProtocolSettings({...protocolSettings, focusToRewardRatioReward: parseInt(e.target.value) || 15})}
-                         className="w-full bg-[#141414] border border-[#cfb991]/20 rounded-xl px-3 py-2 text-[#cfb991] font-mono focus:outline-none focus:border-[#cfb991]/60"
-                         required
-                       />
-                     </div>
-                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-white/5 flex gap-3">
@@ -2581,6 +2531,7 @@ const BlockCountdown = ({ active }: { active: boolean }) => {
                   ))}
                 </div>
               </div>
+            </section>
 
           {/* Subtasks / Brain Dump Section */}
           <section className="bg-black/60 backdrop-blur-2xl border-t border-l border-[#cfb991]/20 border-b border-r border-[#cfb991]/5 rounded-3xl p-6 lg:p-8 flex-grow flex flex-col shadow-2xl">
@@ -2762,6 +2713,7 @@ const BlockCountdown = ({ active }: { active: boolean }) => {
                 </div>
               </form>
             </div>
+          </section>
         </motion.div>
         ) : activeAsideTab === 'master' ? (
         <motion.div
