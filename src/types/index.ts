@@ -138,11 +138,11 @@ export interface GlobalAppState {
 }
 
 export interface GlobalActions {
-  // Data Updates
-  setTrackData: (data: TrackData) => void;
-  setWastedLogs: (logs: Record<string, WastedLog[]>) => void;
-  setMasterTasks: (tasks: GlobalAppState['masterTasks']) => void;
-  setDailyThemes: (themes: Record<string, DailyTheme>) => void;
+  // Data Updates - support both direct values and callbacks
+  setTrackData: (data: TrackData | ((prev: TrackData) => TrackData)) => void;
+  setWastedLogs: (logs: Record<string, WastedLog[]> | ((prev: Record<string, WastedLog[]>) => Record<string, WastedLog[]>)) => void;
+  setMasterTasks: (tasks: Array<{ id: string; text: string; completed: boolean; category?: CategoryType }> | ((prev: Array<{ id: string; text: string; completed: boolean; category?: CategoryType }>) => Array<{ id: string; text: string; completed: boolean; category?: CategoryType }>)) => void;
+  setDailyThemes: (themes: Record<string, DailyTheme> | ((prev: Record<string, DailyTheme>) => Record<string, DailyTheme>)) => void;
   setAcademicCourses: (courses: AcademicCourse[]) => void;
   setProtocolSettings: (settings: ProtocolSettings) => void;
 
@@ -150,6 +150,7 @@ export interface GlobalActions {
   setViewDensity: (density: 'minimal' | 'complex') => void;
   setSelectedHour: (hour: number) => void;
   setSelectedDate: (date: Date) => void;
+  setCurrentDate: (date: Date) => void;
   setActiveAsideTab: (tab: 'hour' | 'master' | 'yield') => void;
   setAlertDismissedForDebt: (minutes: number) => void;
 

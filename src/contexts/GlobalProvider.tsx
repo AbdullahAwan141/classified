@@ -40,6 +40,7 @@ type GlobalAction =
   | { type: 'SET_VIEW_DENSITY'; payload: 'minimal' | 'complex' }
   | { type: 'SET_SELECTED_HOUR'; payload: number }
   | { type: 'SET_SELECTED_DATE'; payload: Date }
+  | { type: 'SET_CURRENT_DATE'; payload: Date }
   | { type: 'SET_ACTIVE_ASIDE_TAB'; payload: 'hour' | 'master' | 'yield' }
   | { type: 'SET_ALERT_DISMISSED_FOR_DEBT'; payload: number }
   | { type: 'TOGGLE_PROTOCOL_SETTINGS'; payload: boolean }
@@ -148,6 +149,9 @@ function globalReducer(state: GlobalAppState, action: GlobalAction): GlobalAppSt
     case 'SET_SELECTED_DATE':
       return { ...state, selectedDate: action.payload };
 
+    case 'SET_CURRENT_DATE':
+      return { ...state, currentDate: action.payload };
+
     case 'SET_ACTIVE_ASIDE_TAB':
       return { ...state, activeAsideTab: action.payload };
 
@@ -207,32 +211,37 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     [state, trackData, wastedLogs, masterTasks, dailyThemes, academicCourses, protocolSettings]
   );
 
-  // Action creators
+  // Action creators - support both direct values and callbacks
   const actions: GlobalActions = useMemo(
     () => ({
-      setTrackData: (data: TrackData) => {
-        setTrackData(data);
-        dispatch({ type: 'SET_TRACK_DATA', payload: data });
+      setTrackData: (data: any) => {
+        const newData = typeof data === 'function' ? data(state.trackData) : data;
+        setTrackData(newData);
+        dispatch({ type: 'SET_TRACK_DATA', payload: newData });
       },
 
-      setWastedLogs: (logs: Record<string, WastedLog[]>) => {
-        setWastedLogs(logs);
-        dispatch({ type: 'SET_WASTED_LOGS', payload: logs });
+      setWastedLogs: (logs: any) => {
+        const newLogs = typeof logs === 'function' ? logs(state.wastedLogs) : logs;
+        setWastedLogs(newLogs);
+        dispatch({ type: 'SET_WASTED_LOGS', payload: newLogs });
       },
 
-      setMasterTasks: (tasks: any[]) => {
-        setMasterTasks(tasks);
-        dispatch({ type: 'SET_MASTER_TASKS', payload: tasks });
+      setMasterTasks: (tasks: any) => {
+        const newTasks = typeof tasks === 'function' ? tasks(state.masterTasks) : tasks;
+        setMasterTasks(newTasks);
+        dispatch({ type: 'SET_MASTER_TASKS', payload: newTasks });
       },
 
-      setDailyThemes: (themes: Record<string, DailyTheme>) => {
-        setDailyThemes(themes);
-        dispatch({ type: 'SET_DAILY_THEMES', payload: themes });
+      setDailyThemes: (themes: any) => {
+        const newThemes = typeof themes === 'function' ? themes(state.dailyThemes) : themes;
+        setDailyThemes(newThemes);
+        dispatch({ type: 'SET_DAILY_THEMES', payload: newThemes });
       },
 
-      setAcademicCourses: (courses: AcademicCourse[]) => {
-        setAcademicCourses(courses);
-        dispatch({ type: 'SET_ACADEMIC_COURSES', payload: courses });
+      setAcademicCourses: (courses: any) => {
+        const newCourses = typeof courses === 'function' ? courses(state.academicCourses) : courses;
+        setAcademicCourses(newCourses);
+        dispatch({ type: 'SET_ACADEMIC_COURSES', payload: newCourses });
       },
 
       setProtocolSettings: (settings: ProtocolSettings) => {
@@ -250,6 +259,10 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       setSelectedDate: (date: Date) => {
         dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+      },
+
+      setCurrentDate: (date: Date) => {
+        dispatch({ type: 'SET_CURRENT_DATE', payload: date });
       },
 
       setActiveAsideTab: (tab: 'hour' | 'master' | 'yield') => {
