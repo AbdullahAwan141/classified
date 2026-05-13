@@ -67,7 +67,7 @@ export const TYPOGRAPHY = {
 
   // Line Heights
   tight: 'leading-tight',
-  normal: 'leading-normal',
+  normalHeight: 'leading-normal',
   relaxed: 'leading-relaxed',
   loose: 'leading-loose',
 } as const;
@@ -150,37 +150,40 @@ export const TRANSITIONS = {
 // REUSABLE COMPONENT STYLES
 // ============================================
 
+// Base button styles (defined first to avoid circular reference)
+const buttonBase = `px-4 py-2 font-bold uppercase tracking-widest text-xs rounded-xl transition-all active:scale-95`;
+
 export const COMPONENT_STYLES = {
   // Button Styles
-  buttonBase: `px-4 py-2 font-bold uppercase tracking-widest text-xs rounded-xl transition-all active:scale-95`,
-  buttonPrimary: `${COMPONENT_STYLES.buttonBase} bg-[#cfb991] hover:bg-[#EEDC9A] text-black shadow-lg shadow-[#cfb991]/10`,
-  buttonSecondary: `${COMPONENT_STYLES.buttonBase} bg-white/10 border border-white/20 text-white hover:bg-white/20`,
-  buttonGhost: `${COMPONENT_STYLES.buttonBase} text-white/60 hover:text-white hover:bg-white/10`,
-  buttonDanger: `${COMPONENT_STYLES.buttonBase} bg-[#8B0000]/10 border border-[#8B0000]/30 text-[#8B0000] hover:bg-[#8B0000]/20`,
+  buttonBase,
+  buttonPrimary: `${buttonBase} bg-[#cfb991] hover:bg-[#EEDC9A] text-black shadow-lg shadow-[#cfb991]/10`,
+  buttonSecondary: `${buttonBase} bg-white/10 border border-white/20 text-white hover:bg-white/20`,
+  buttonGhost: `${buttonBase} text-white/60 hover:text-white hover:bg-white/10`,
+  buttonDanger: `${buttonBase} bg-[#8B0000]/10 border border-[#8B0000]/30 text-[#8B0000] hover:bg-[#8B0000]/20`,
 
   // Input Styles
-  inputBase: `w-full bg-black/40 border border-white/10 px-4 py-3 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:border-[#cfb991]/50 transition-all`,
-  inputGold: `w-full bg-black/40 border border-[#cfb991]/20 px-4 py-3 text-[#cfb991] font-mono placeholder:text-white/10 rounded-xl focus:outline-none focus:border-[#cfb991]/60 transition-all`,
+  inputBase: `w-full bg-black/40 border border-white/10 px-4 py-3 text-white placeholder:text-white/20 rounded-xl focus:outline-none focus:border-[#cfb991]/50 transition-all` as const,
+  inputGold: `w-full bg-black/40 border border-[#cfb991]/20 px-4 py-3 text-[#cfb991] font-mono placeholder:text-white/10 rounded-xl focus:outline-none focus:border-[#cfb991]/60 transition-all` as const,
 
   // Card Styles
-  cardBase: `bg-white/[0.02] border border-white/5 rounded-2xl p-6 transition-all`,
-  cardGold: `bg-[#cfb991]/5 border border-[#cfb991]/20 rounded-2xl p-6 transition-all hover:bg-[#cfb991]/10`,
-  cardDark: `bg-black/60 border border-white/5 rounded-3xl p-6 backdrop-blur-3xl`,
+  cardBase: `bg-white/[0.02] border border-white/5 rounded-2xl p-6 transition-all` as const,
+  cardGold: `bg-[#cfb991]/5 border border-[#cfb991]/20 rounded-2xl p-6 transition-all hover:bg-[#cfb991]/10` as const,
+  cardDark: `bg-black/60 border border-white/5 rounded-3xl p-6 backdrop-blur-3xl` as const,
 
   // Section Styles
-  sectionBase: `bg-black/60 backdrop-blur-2xl border border-[#cfb991]/10 rounded-3xl overflow-hidden shadow-2xl`,
-  sectionDark: `bg-black/40 border border-white/5 rounded-3xl p-6 backdrop-blur-xl`,
+  sectionBase: `bg-black/60 backdrop-blur-2xl border border-[#cfb991]/10 rounded-3xl overflow-hidden shadow-2xl` as const,
+  sectionDark: `bg-black/40 border border-white/5 rounded-3xl p-6 backdrop-blur-xl` as const,
 
   // Badge/Pill Styles
-  badgeBase: `px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest`,
-  badgeGold: `${COMPONENT_STYLES.badgeBase} bg-[#cfb991]/10 text-[#cfb991] border border-[#cfb991]/20`,
-  badgeDanger: `${COMPONENT_STYLES.badgeBase} bg-[#8B0000]/10 text-[#8B0000] border border-[#8B0000]/20`,
+  badgeBase: `px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest` as const,
+  badgeGold: `px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest bg-[#cfb991]/10 text-[#cfb991] border border-[#cfb991]/20` as const,
+  badgeDanger: `px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest bg-[#8B0000]/10 text-[#8B0000] border border-[#8B0000]/20` as const,
 
   // Text Styles
-  textCaption: `text-xs font-black uppercase tracking-widest text-white/40`,
-  textSmall: `text-sm text-white/80`,
-  textBody: `text-base text-white leading-relaxed`,
-  textHeading: `text-2xl font-serif italic text-white tracking-wide`,
+  textCaption: `text-xs font-black uppercase tracking-widest text-white/40` as const,
+  textSmall: `text-sm text-white/80` as const,
+  textBody: `text-base text-white leading-relaxed` as const,
+  textHeading: `text-2xl font-serif italic text-white tracking-wide` as const,
 } as const;
 
 // ============================================

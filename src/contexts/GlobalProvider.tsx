@@ -6,7 +6,7 @@
  * Implements reactive updates: changes propagate immediately to all subscribers.
  */
 
-import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import { ReactNode, createContext, useContext, useReducer, useCallback, useMemo } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import {
   GlobalAppState,
@@ -179,7 +179,7 @@ function globalReducer(state: GlobalAppState, action: GlobalAction): GlobalAppSt
  * GlobalProvider Component
  * Wraps the app and provides state + actions to all components
  */
-export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GlobalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(globalReducer, createInitialState());
 
   // Load persisted data from localStorage
@@ -299,7 +299,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
  * Custom hook to use the global context
  * Returns both state and action creators
  */
-export const useGlobal = (): GlobalAppState & GlobalActions => {
+export const useGlobal = (): (GlobalAppState & GlobalActions) => {
   const context = useContext(GlobalContext);
   if (!context) {
     throw new Error('useGlobal must be used within GlobalProvider');

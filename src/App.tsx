@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Calendar, Clock, RefreshCw, RotateCw, Plus, X, ChevronLeft, ChevronRight, ListTodo, PieChart, AlertTriangle, ArrowRight, Trash2, LayoutList, Pencil, Bell, BellRing, Save, Copy, Download, Target, Activity, Settings, TrendingUp, Sparkles } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
@@ -231,12 +231,12 @@ const AppContent = () => {
     const nd = new Date(currentDateObj);
     nd.setDate(nd.getDate() + days);
     // Update global current date
-    global.setCurrentDate?.(nd);
+    global.setCurrentDate(nd);
     setSelectedTask(dayTasks[actualHour] || null);
   };
 
   const jumpToToday = () => {
-    global.setCurrentDate?.(new Date());
+    global.setCurrentDate(new Date());
     setSelectedHour(new Date().getHours());
   };
 

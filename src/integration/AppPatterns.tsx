@@ -5,6 +5,7 @@
  * Copy these patterns into the actual App component
  */
 
+import { useMemo } from 'react';
 import { useGlobal, useUIState, useTemporalState, useAcademicState, useAnalyticsState } from '../contexts/GlobalProvider';
 import { calculateTemporalStats, calculateFocusMinutes, calculateWastedMinutes } from '../services/temporal.service';
 import { calculateCategoryStats, calculateEfficiencyPercentage, CATEGORIES } from '../services/analytics.service';
@@ -116,7 +117,7 @@ export function createTaskManager(
       const task = newData[dateStr][hour];
       newData[dateStr][hour] = {
         ...task,
-        subtasks: (task.subtasks || []).map(st =>
+        subtasks: (task.subtasks || []).map((st: any) =>
           st.id === subtaskId ? { ...st, completed: !st.completed } : st
         )
       };
@@ -131,7 +132,7 @@ export function createTaskManager(
       const task = newData[dateStr][hour];
       newData[dateStr][hour] = {
         ...task,
-        subtasks: (task.subtasks || []).filter(st => st.id !== subtaskId)
+        subtasks: (task.subtasks || []).filter((st: any) => st.id !== subtaskId)
       };
       return newData;
     });
